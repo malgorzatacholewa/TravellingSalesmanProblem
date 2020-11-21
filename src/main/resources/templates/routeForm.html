@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Route ... find your best way</title>
+    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+
+        th {
+            padding: 5px;
+            text-align: left;
+        }
+
+        td {
+            border: 1px solid black;
+            padding: 5px;
+            text-align: left;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Route ... find your best way!</h1>
+
+<img src="car.jpg" alt="Car" style="width:128px;height:128px">
+
+<h2>Dodaj miejsca i wyznacz najkrótszą trasę. Jako pierwsze miejsce podaj punkt startowy na Twojej trasie (będący jednocześnie punktem końcowym). </h2>
+
+<ol id="list"></ol>
+
+<button id="submit" type="submit">Wyznacz trasę</button>
+<button id="addPoint">Dodaj miejsce</button>
+<button id='cancelPoint'>Usuń ostatnio dodane miejsce</button>
+
+
+<script type="text/javascript">
+    let butEl = document.getElementById("addPoint");
+    butEl.addEventListener('click', function () {
+        let newElement = document.createElement('li');
+        newElement.innerHTML = '<form><fieldset>\n' +
+            '<legend>Punkt:</legend>' +
+            '<label for="street">Street:</label><br>' +
+            '<input type="text" name="street" value=" "><br>' +
+            '<label for="streetNumber">Street number:</label><br>' +
+            '<input type="text" name="streetNumber" value=" "><br>' +
+            '<label for="city">City:</label><br>' +
+            '<input type="text" name="city" value=" "><br>' +
+            '<label for="postCode">Post code:</label><br>' +
+            '<input type="text" name="postCode" value=" " pattern="[0-9]{2}-[0-9]{3}" required><br>' +
+            '<label for="country">Country:</label><br>' +
+            '<input type="text" name="country" value=" "><br><br>' +
+            '<input type="reset" value="Wyczyść wszystkie pola">' +
+            '</fieldset></form>';
+
+        let listEl = document.getElementById("list");
+        listEl.appendChild(newElement);
+    })
+
+    let butEl2 = document.getElementById("cancelPoint");
+    butEl2.addEventListener('click', function () {
+        let listEl = document.getElementById("list");
+        let lastChildEl = listEl.lastChild;
+        if (lastChildEl) {
+            listEl.removeChild(lastChildEl);
+        }
+    })
+
+    let butEl3 = document.getElementById("submit");
+    butEl3.addEventListener('click', function () {
+        let listOfPoints = document.getElementById('list').querySelectorAll('li');
+        let result = [];
+
+        for (let elem of listOfPoints) {
+            let point = {};
+            let inputs = elem.querySelectorAll('input');
+
+            for (let input of inputs) {
+                switch (input.name) {
+                    case 'street':
+                        point.street = input.value;
+                        break;
+                    case 'streetNumber':
+                        point.streetNumber = input.value;
+                        break;
+                    case 'city':
+                        point.city = input.value;
+                        break;
+                    case 'postCode':
+                        point.postCode = input.value;
+                        break;
+                    case 'country':
+                        point.country = input.value;
+                        break;
+                }
+            }
+            result.push(point);
+        }
+
+        const url = "http://localhost:8082/route";
+        const params = {
+            headers:{
+                "content-type":"application/json; charset=UTF-8"
+            },
+            body: JSON.stringify(result),
+            method:"POST"
+        };
+        fetch(url, params)
+            .then(data => {
+                console.log(data.json());
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+    })
+</script>
+
+</body>
+</html>
