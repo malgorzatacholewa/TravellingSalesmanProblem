@@ -16,11 +16,12 @@ import java.util.List;
 @AllArgsConstructor
 @RequestMapping
 public class RouteController {
+    AlgorithmFacade facade;
+
     @PostMapping("/route")
     public AlgorithmResponse getRoute(@RequestBody ArrayList<Point> listOfPoints) {
         try {
-            AlgorithmFacade facade = new AlgorithmFacade(listOfPoints);
-            return facade.getRoute("GOOGLE");
+            return facade.getRoute("GOOGLE", listOfPoints);
         } catch (IOException e) {
             e.printStackTrace();
         }

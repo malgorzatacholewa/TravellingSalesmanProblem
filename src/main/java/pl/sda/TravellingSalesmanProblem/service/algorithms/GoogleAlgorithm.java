@@ -1,28 +1,27 @@
 package pl.sda.TravellingSalesmanProblem.service.algorithms;
 import com.google.ortools.Loader;
 import com.google.ortools.constraintsolver.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 import pl.sda.TravellingSalesmanProblem.model.AlgorithmResponse;
 import pl.sda.TravellingSalesmanProblem.model.Point;
-
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 
 class GoogleAlgorithm implements Algorithm {
     private int vehicleNumber;
     private int firstPoint;
-    private long[][] distanceMatrix;
-    private List<Point> listOfPoints;
 
-
-    public GoogleAlgorithm(long[][] distanceMatrix, List<Point> listOfPoints ) {
+    public GoogleAlgorithm() {
         this.vehicleNumber = 1;
         this.firstPoint = 0;
-        this.distanceMatrix = distanceMatrix;
-        this.listOfPoints = listOfPoints;
     }
 
-    public AlgorithmResponse getRoute(){
+    public AlgorithmResponse getRoute(long[][] distanceMatrix, List<Point> listOfPoints ){
         Loader.loadNativeLibraries();
         RoutingIndexManager manager = new RoutingIndexManager(distanceMatrix.length, vehicleNumber, firstPoint);
         RoutingModel routing = new RoutingModel(manager);
