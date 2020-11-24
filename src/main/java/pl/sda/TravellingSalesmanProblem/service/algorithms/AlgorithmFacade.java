@@ -1,6 +1,6 @@
 package pl.sda.TravellingSalesmanProblem.service.algorithms;
+
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
 import pl.sda.TravellingSalesmanProblem.model.AlgorithmResponse;
 import pl.sda.TravellingSalesmanProblem.model.Point;
 
@@ -14,22 +14,14 @@ public class AlgorithmFacade {
     private long[][] distanceMatrix;
     private Map<String, Algorithm> algorithms;
 
-    public AlgorithmFacade(GoogleAlgorithm googleAlgorithm)  {
+    public AlgorithmFacade(GoogleAlgorithm googleAlgorithm) {
         this.algorithms = new HashMap<>();
         this.algorithms.put("GOOGLE", googleAlgorithm);
     }
 
-    public AlgorithmResponse getRoute(String algotihmType, List<Point> points) throws IOException {
-        if(this.distanceMatrix == null){
-            this.distanceMatrix = DistanceMatrix.createDistanceMatrix(points);
-        }
-
-        Algorithm algorithm = this.algorithms.get(algotihmType);
-
-        if (algorithm != null) {
-            return algorithm.getRoute(this.distanceMatrix, points);
-        } else {
-            throw new NullPointerException();
-        }
+    public AlgorithmResponse getRoute(String algorithmType, List<Point> points) throws IOException {
+        this.distanceMatrix = DistanceMatrix.createDistanceMatrix(points);
+        Algorithm algorithm = this.algorithms.get(algorithmType);
+        return algorithm.getRoute(this.distanceMatrix, points);
     }
 }

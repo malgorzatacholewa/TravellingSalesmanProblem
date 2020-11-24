@@ -1,17 +1,13 @@
 package pl.sda.TravellingSalesmanProblem.service.algorithms;
 import com.google.ortools.Loader;
 import com.google.ortools.constraintsolver.*;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
 import pl.sda.TravellingSalesmanProblem.model.AlgorithmResponse;
 import pl.sda.TravellingSalesmanProblem.model.Point;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
-
 class GoogleAlgorithm implements Algorithm {
     private int vehicleNumber;
     private int firstPoint;

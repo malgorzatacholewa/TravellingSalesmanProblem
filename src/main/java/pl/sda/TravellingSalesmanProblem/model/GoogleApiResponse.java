@@ -25,11 +25,9 @@ public class GoogleApiResponse {
     private int distance;
     private int duration;
 
-//    @SuppressWarnings("unchecked")
     @JsonProperty("rows")
     private void unpackNested(List<Map<String, Object>> rows) {
         List<Map<String,Object>> elements = (List<Map<String,Object>>) rows.get(0).get("elements");
-
         if (elements.size() == 1){
             Map<String, Integer> distanceMap = (Map<String, Integer>) elements.get(0).get("distance");
             this.distance = distanceMap.get("value");
@@ -39,15 +37,5 @@ public class GoogleApiResponse {
         }
     }
 
-    @Override
-    public String toString() {
-        return "GoogleApiResponse{" +
-                "destination_addresses=" + Arrays.toString(destination_addresses) +
-                ", origin_addresses=" + Arrays.toString(origin_addresses) +
-                ", status='" + status + '\'' +
-                ", distance=" + distance +
-                ", duration=" + duration +
-                '}';
-    }
 }
 

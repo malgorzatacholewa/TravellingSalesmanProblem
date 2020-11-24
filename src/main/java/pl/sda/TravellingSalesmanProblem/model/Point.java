@@ -1,7 +1,5 @@
 package pl.sda.TravellingSalesmanProblem.model;
-
 import lombok.*;
-
 
 @Getter
 @Setter
@@ -14,6 +12,4 @@ public class Point {
     private String city;
     private String postCode;
     private String country;
-
-
 }
