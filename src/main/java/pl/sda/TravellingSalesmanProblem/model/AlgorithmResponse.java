@@ -15,6 +15,7 @@ public class AlgorithmResponse {
     private long numberOfKilometers;
     private List<Point> listOfPoints;
     private List<Integer> orderOfPoints;
+    private String errorMessage;
 
 
 }

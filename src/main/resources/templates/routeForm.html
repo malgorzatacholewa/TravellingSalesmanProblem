@@ -28,9 +28,10 @@
 
 <h1>Route ... find your best way!</h1>
 
-<img src="car.jpg" alt="Car" style="width:128px;height:128px">
+<img src="../static/images/car.jpg" alt="Car" style="width:128px;height:128px">
 
-<h3>Dodaj miejsca i wyznacz najkrótszą trasę. Jako pierwsze miejsce podaj punkt startowy na Twojej trasie (będący jednocześnie punktem końcowym). </h3>
+<h3>Dodaj miejsca i wyznacz najkrótszą trasę. Jako pierwsze miejsce podaj punkt startowy na Twojej trasie (będący
+    jednocześnie punktem końcowym). </h3>
 
 <ol start="0" id="list"></ol>
 
@@ -38,10 +39,11 @@
 <button id="addPoint">Dodaj miejsce</button>
 <button id='cancelPoint'>Usuń ostatnio dodane miejsce</button>
 
-<h3>Kolejność punktów: <br></h3>
-<h2 id="pointsOrder" style="color: #f44336"></h2>
-<h3>Długośc trasy (km):<br></h3>
-<h2 id="length"style="color: #f44336"></h2>
+<h3 id="title1"></h3>
+<h2 id="pointsOrder" style="color: #339966"></h2>
+<h3 id="title2"></h3>
+<h2 id="length" style="color: #339966"></h2>
+<h3 id="errors"></h3>
 
 <script type="text/javascript">
     let butEl = document.getElementById("addPoint");
@@ -49,15 +51,15 @@
         let newElement = document.createElement('li');
         newElement.innerHTML = '<form><fieldset>\n' +
             '<legend>Punkt:</legend>' +
-            '<label for="street">Street:</label><br>' +
+            '<label for="street">Ulica:</label><br>' +
             '<input type="text" name="street" value=""><br>' +
-            '<label for="streetNumber">Street number:</label><br>' +
+            '<label for="streetNumber">Numer domu:</label><br>' +
             '<input type="text" name="streetNumber" value=""><br>' +
-            '<label for="city">City:</label><br>' +
+            '<label for="city">Miasto:</label><br>' +
             '<input type="text" name="city" value=""><br>' +
-            '<label for="postCode">Post code:</label><br>' +
+            '<label for="postCode">Kod pocztowy:</label><br>' +
             '<input type="text" name="postCode" value="" pattern="[0-9]{2}-[0-9]{3}" required><br>' +
-            '<label for="country">Country:</label><br>' +
+            '<label for="country">Państwo:</label><br>' +
             '<input type="text" name="country" value=""><br><br>' +
             '<input type="reset" value="Wyczyść wszystkie pola">' +
             '</fieldset></form>';
@@ -74,11 +76,15 @@
             listEl.removeChild(lastChildEl);
         }
     })
+    const errorPostCode = "W formularzu podano zły format kodu pocztowego.";
+    const errorLetters = "W polach ulica, miasto i państwo mogą znajdować się jedynie litery.";
+    const errorNumbers = "W polu numer ulicy należy wpisać liczbę.";
 
     let butEl3 = document.getElementById("submit");
     butEl3.addEventListener('click', function () {
         let listOfPoints = document.getElementById('list').querySelectorAll('li');
         let result = [];
+        let errors = [];
 
         for (let elem of listOfPoints) {
             let point = {};
@@ -87,51 +93,97 @@
             for (let input of inputs) {
                 switch (input.name) {
                     case 'street':
-                        point.street = input.value;
+                        if (testIfOnlyLetters(input.value)) {
+                            point.street = input.value;
+                        } else {
+                            errors.push(errorLetters);
+                        }
                         break;
                     case 'streetNumber':
-                        point.streetNumber = input.value;
+                        if (testIfOnlyNumbers(input.value)) {
+                            point.streetNumber = input.value;
+                        } else {
+                            errors.push(errorNumbers);
+                        }
                         break;
                     case 'city':
-                        point.city = input.value;
+                        if (testIfOnlyLetters(input.value)) {
+                            point.city = input.value;
+                        } else {
+                            errors.push(errorLetters);
+                        }
                         break;
                     case 'postCode':
-                        point.postCode = input.value;
+                        if (testPostCode(input.value)) {
+                            point.postCode = input.value;
+                        } else {
+                            errors.push(errorPostCode);
+                        }
                         break;
                     case 'country':
-                        point.country = input.value;
+                        if (testIfOnlyLetters(input.value)) {
+                            point.country = input.value;
+                        } else {
+                            errors.push(errorLetters);
+                        }
                         break;
                 }
             }
             result.push(point);
         }
-
-        const url = "http://localhost:8082/route";
-        const params = {
-            headers:{
-                "content-type":"application/json; charset=UTF-8"
-            },
-            body: JSON.stringify(result),
-            method:"POST"
-        };
-        fetch(url, params)
-            .then(async data => {
-                let result = await data.json();
-                let orderString = '';
-                orderString = orderString + result.orderOfPoints[0];
-                    for(let i = 1; i < result.orderOfPoints.length; i++){
+        if (errors.length != 0) {
+            const uniqueErrors = new Set(errors);
+            let errorsResult = '';
+            for(let error of uniqueErrors){
+                errorsResult = errorsResult + error + "<br>";
+            }
+            document.getElementById("errors").innerHTML = errorsResult.toString();
+        } else {
+            const url = "http://localhost:8082/route";
+            const params = {
+                headers: {
+                    "content-type": "application/json; charset=UTF-8"
+                },
+                body: JSON.stringify(result),
+                method: "POST"
+            };
+            fetch(url, params)
+                .then(async data => {
+                    let result = await data.json();
+                    if (result.errorMessage != null){
+                        document.getElementById("length").innerHTML = result.errorMessage;
+                    } else {
+                    let orderString = '';
+                    orderString = orderString + result.orderOfPoints[0];
+                    for (let i = 1; i < result.orderOfPoints.length; i++) {
                         orderString = orderString + " -- > " + result.orderOfPoints[i];
-                }
+                    }
+                    document.getElementById("title1").innerHTML = "Kolejność punktów:<br>";
                     document.getElementById("pointsOrder").innerHTML = orderString;
-                    document.getElementById("length").innerHTML = result.numberOfKilometers/1000;
-            })
-            .catch((err) => {
-                console.log(err);
-            })
+                    document.getElementById("title2").innerHTML = "Długośc trasy (km):<br>";
+                    document.getElementById("length").innerHTML = result.numberOfKilometers / 1000;
+                }})
+                .catch((err) => {
+                    console.log(err)
+                })
+        }
 
+        function testPostCode(postCode) {
+            const regex = new RegExp('^[0-9]{2}-[0-9]{3}$');
+            return regex.test(postCode);
+        }
 
+        function testIfOnlyLetters(string) {
+            const regex = new RegExp('[a-zA-Z]');
+            return regex.test(string);
+        }
 
+        function testIfOnlyNumbers(number) {
+            const regex = new RegExp('[0-9]');
+            return regex.test(number);
+        }
     })
+
 </script>
 
 </body>

@@ -29,7 +29,7 @@ a:hover, a:active {
 }
 
 .image {
-    background-image: url(templates/car.jpg);
+    background-image: url(images/car.jpg);
     width: 150px;
     height: 150px;
 }
