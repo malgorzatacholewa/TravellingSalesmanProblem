@@ -8,7 +8,6 @@ import pl.sda.TravellingSalesmanProblem.model.Point;
 import pl.sda.TravellingSalesmanProblem.service.algorithms.AlgorithmFacade;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -19,10 +18,13 @@ public class RouteController {
     @PostMapping("/route")
     public ResponseEntity<AlgorithmResponse> getRoute(@RequestBody ArrayList<Point> listOfPoints) {
         try {
-            return new ResponseEntity<>(facade.getRoute("GOOGLE", listOfPoints), HttpStatus.OK);
+            return new ResponseEntity<>(facade.getRoute("simulatedAnnealing", listOfPoints), HttpStatus.OK);
         } catch (IOException e) {
+            e.printStackTrace();
+
            AlgorithmResponse algorithmResponse = new AlgorithmResponse();
-           algorithmResponse.setErrorMessage("Podano błędny adres.");
+           algorithmResponse.setErrorMessage("Wystąpił błąd podczas łączenia z Google: " + e.getMessage());
+
            return new ResponseEntity<>(algorithmResponse,HttpStatus.BAD_REQUEST);
         }
     }
